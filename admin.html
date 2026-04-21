@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin Panel</title>
+
+<style>
+:root{
+  --primary:#0b1f5c;
+  --accent:#f1c40f;
+}
+
+/* GLOBAL */
+*{
+  box-sizing:border-box;
+  font-family:system-ui,Arial;
+}
+
+body{
+  margin:0;
+  background:#f4f6fb;
+}
+
+/* CONTAINER */
+.container{
+  max-width:100%;
+  padding:15px;
+}
+
+/* HEADINGS */
+h2{
+  text-align:center;
+  color:var(--primary);
+  margin-bottom:10px;
+}
+
+/* INPUT */
+input,select{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border-radius:10px;
+  border:1px solid #ddd;
+  font-size:14px;
+  background:#fff;
+  text-transform:uppercase;
+  transition:0.2s;
+}
+
+/* FOCUS */
+input:focus,select:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 2px rgba(11,31,92,0.1);
+  outline:none;
+}
+
+/* BUTTON */
+button{
+  padding:10px;
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+  transition:0.2s;
+}
+
+button:hover{
+  background:#091847;
+}
+
+/* ACTION BUTTON COLORS */
+.edit{
+  background:orange;
+}
+
+.delete{
+  background:#e74c3c;
+}
+
+/* PLAYER GRID */
+.player{
+  display:grid;
+  grid-template-columns:2fr 1fr 1.5fr;
+  gap:8px;
+  margin-bottom:5px;
+}
+
+/* TABLE WRAPPER (for mobile scroll) */
+.table-wrap{
+width:100%;
+overflow-x:auto;
+}
+
+/* TABLE */
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
+background:#fff;
+min-width:600px;
+}
+
+/* HEADER */
+th{
+background:#0b1f5c;
+color:#fff;
+padding:12px;
+text-align:left;
+font-size:14px;
+}
+
+/* DATA */
+td{
+padding:10px;
+border-bottom:1px solid #eee;
+font-size:14px;
+vertical-align:middle;
+}
+
+/* COLUMN ALIGN */
+td:nth-child(1){text-align:left;}   /* Team */
+td:nth-child(2){text-align:center;} /* Phone */
+td:nth-child(3){text-align:left;}   /* Address */
+td:nth-child(4){text-align:center;} /* Action */
+
+/* ROW HOVER */
+tr:hover{
+background:#f9f9f9;
+}
+
+/* BUTTON ALIGN */
+td button{
+margin:2px;
+}
+ tr:nth-child(even){
+background:#fafafa;
+}
+/* SLOT SECTION */
+h3{
+  margin-top:20px;
+  color:var(--primary);
+}
+
+/* POPUP */
+#popup{
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.7);
+color:#fff;
+display:none;
+align-items:center;
+justify-content:center;
+text-align:center;
+flex-direction:column;
+z-index:2000; /* 🔥 HIGHER THAN EDIT POPUP */
+}
+
+/* LOADER */
+.loader{
+  border:5px solid #f3f3f3;
+  border-top:5px solid var(--accent);
+  border-radius:50%;
+  width:45px;
+  height:45px;
+  animation:spin 1s linear infinite;
+  margin-bottom:15px;
+}
+
+@keyframes spin{
+  100%{transform:rotate(360deg);}
+}
+
+/* LOGO */
+.logo{
+display:block;
+margin:10px auto;
+max-width:140px;
+}
+
+/* LOGIN BOX */
+#loginBox{
+max-width:350px;
+margin:30px auto;
+padding:20px;
+background:#fff;
+border-radius:12px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+text-align:center;
+}
+
+/* SEARCH */
+.searchBox{
+width:100%;
+padding:10px;
+margin:10px 0;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+/* TABLE HEADER FIX */
+th{
+background:#0b1f5c;
+color:#fff;
+}
+
+/* BUTTON IMPROVE */
+button{
+font-weight:bold;
+}
+
+
+/* TABLE */
+table{
+width:100%;
+border-collapse:separate;
+border-spacing:0;
+margin-top:15px;
+background:#fff;
+border-radius:10px;
+overflow:hidden;
+min-width:700px;
+}
+
+/* HEADER */
+th{
+background:#0b1f5c;
+color:#fff;
+padding:12px;
+font-size:13px;
+text-align:left;
+}
+
+/* DATA */
+td{
+padding:12px;
+font-size:13px;
+border-bottom:1px solid #eee;
+}
+
+/* COLUMN WIDTH */
+/* SL NO - CENTER */
+th:nth-child(1), td:nth-child(1){
+  width:5%;
+  text-align:center;
+}
+
+/* TEAM NAME - LEFT */
+th:nth-child(2), td:nth-child(2){
+  width:30%;
+  text-align:left;
+}
+
+/* PHONE - LEFT */
+th:nth-child(3), td:nth-child(3){
+  width:20%;
+  text-align:left;
+}
+
+/* ADDRESS - LEFT */
+th:nth-child(4), td:nth-child(4){
+  width:25%;
+  text-align:left;
+}
+
+/* ACTION - CENTER */
+th:nth-child(5), td:nth-child(5){
+  width:20%;
+  text-align:center;
+}
+
+/* ROW STYLE */
+tr:hover{
+background:#f4f7ff;
+}
+
+/* BUTTON STYLE */
+td button{
+padding:6px 8px;
+font-size:12px;
+border-radius:6px;
+}
+
+/* MOBILE SCROLL */
+.table-wrap{
+overflow-x:auto;
+}
+
+
+#scheduleData td{
+vertical-align:top;
+}
+
+/* 🔥 TOURNAMENT TABLE FIXED LAYOUT */
+#tournamentBox table{
+  table-layout: auto;   /* 🔥 AUTO WIDTH BASED ON DATA */
+  width: 100%;
+}
+
+/* 🔥 DESKTOP: KEEP CLEAN */
+#tournamentBox th,
+#tournamentBox td{
+  white-space: nowrap;   /* ❌ NO WRAP */
+  overflow: visible;     /* ✅ SHOW FULL TEXT */
+  text-overflow: unset;  /* ❌ REMOVE ... */
+}
+
+/* 🔥 MOBILE FIX: SHOW FULL TEXT */
+@media(max-width:768px){
+
+  #tournamentBox th,
+  #tournamentBox td{
+    white-space: normal;   /* allow wrap */
+    overflow: visible;
+    text-overflow: unset;
+    word-break: break-word;
+  }
+
+}
+
+@media(max-width:768px){
+  #tournamentBox table{
+    min-width:600px;
+  }
+}
+
+/* 🔥 COLUMN WIDTH SAME STYLE */
+#tournamentBox th:nth-child(1),
+#tournamentBox td:nth-child(1){ width:25%; }  /* Name */
+
+#tournamentBox th:nth-child(2),
+#tournamentBox td:nth-child(2){ width:10%; }  /* Date */
+
+#tournamentBox th:nth-child(3),
+#tournamentBox td:nth-child(3){ width:10%; text-align:center; }  /* Time */
+
+#tournamentBox th:nth-child(4),
+#tournamentBox td:nth-child(4){ width:20%; text-align:center; }  /* Fees */
+
+#tournamentBox th:nth-child(5),
+#tournamentBox td:nth-child(5){ width:10%; text-align:center; }  /* Teams */ 
+
+#tournamentBox th:nth-child(7),
+#tournamentBox td:nth-child(7){ width:10%; text-align:center; }  /* Action */ 
+
+
+/* 🔥 TOURNAMENT ALIGNMENT FIX */
+#tournamentBox td,
+#tournamentBox th{
+  text-align:left;
+}
+
+/* ONLY ACTION CENTER */
+#tournamentBox td:last-child,
+#tournamentBox th:last-child{
+  text-align:center;
+}
+
+
+/* 🔥 MATCH TEAM TABLE DESIGN */
+#tournamentBox table{
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  min-width: 700px;
+}
+
+/* HEADER SAME STYLE */
+#tournamentBox th{
+  background:#0b1f5c;
+  color:#fff;
+  white-space: nowrap;
+  padding:12px;
+  font-size:13px;
+}
+
+/* DATA SAME STYLE */
+#tournamentBox td{
+  padding:12px;
+  white-space: nowrap;
+  font-size:13px;
+  border-bottom:1px solid #eee;
+}
+
+/* ROW HOVER */
+#tournamentBox tr:hover{
+  background:#f4f7ff;
+}
+
+/* 🔥 ACTION BUTTON FIX (IMPORTANT) */
+#tournamentBox td:last-child{
+  white-space: nowrap;   /* keep buttons in one line */
+}
+
+#scheduleData table td{
+vertical-align:top;
+}
+
+/* BUTTON STYLE SAME AS TEAM */
+#tournamentBox td button{
+  padding:6px 8px;
+  font-size:12px;
+  border-radius:6px;
+  margin:2px;
+  display:inline-block;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOADER -->
+<div id="popup">
+<div class="loader"></div>
+<div id="popupText">⏳ PLEASE WAIT...</div>
+</div>
+
+<div class="container">
+
+    <img src="https://i.postimg.cc/8kvfTgrb/about1.png" class="logo">
+
+
+<div id="loginBox">
+  <h2>MHCC LOGIN</h2>
+<input type="password" id="pass" placeholder="ENTER PASSWORD" autofocus>
+<button onclick="login()">LOGIN</button>
+</div>
+
+<div id="panel" style="display:none">
+
+  <input type="hidden" id="slotInput">
+  
+<h2>MHCC-JUGALA Admin Dashboard</h2>  
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+flex-wrap:wrap;
+gap:12px;
+background:#ffffff;
+padding:12px;
+border-radius:12px;
+box-shadow:0 5px 15px rgba(0,0,0,0.08);
+">
+
+<!-- LEFT BUTTONS -->
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
+
+<button style="
+background:linear-gradient(135deg,#ff006a,#00c8ff);
+padding:10px 14px;
+border-radius:10px;
+font-size:13px;
+box-shadow:0 3px 8px rgba(0,0,0,0.15);
+" onclick="redirectHome()">MHCC HOME</button>
+
+<button style="
+background:linear-gradient(135deg,#11998e,#38ef7d);
+padding:10px 14px;
+border-radius:10px;
+font-size:13px;
+box-shadow:0 3px 8px rgba(0,0,0,0.15);
+" onclick="redirectPage()">🏏 GO TO SCORING</button>
+
+</div>
+
+<!-- RIGHT BUTTON -->
+<div>
+  
+<button style="
+background:linear-gradient(135deg,#ff4e50,#0008ff);
+padding:10px 14px;
+border-radius:10px;
+font-size:13px;
+box-shadow:0 3px 8px rgba(0,0,0,0.15);
+" onclick="clearAll()">🗑 CLEAR ALL DATA</button>
+
+<button style="
+background:linear-gradient(135deg,#ff0000,#ff0000);
+padding:10px 16px;
+border-radius:10px;
+font-size:13px;
+box-shadow:0 3px 8px rgba(0,0,0,0.2);
+" onclick="logout()">🚪 LOGOUT</button>
+</div>
+
+</div>  
+
+<div id="tournamentBox" style="
+background:#fff;
+padding:15px;
+border-radius:12px;
+box-shadow:0 5px 15px rgba(0,0,0,0.08);
+margin-bottom:15px;
+">
+
+<h2>Tournament Details</h2>
+
+<div style="margin-top:10px;text-align:right;">
+<button onclick="goToCreateMatch('create')">➕ CREATE TOURNAMENT</button>
+</div>
+<div id="tournamentData">Loading Data Please Wait.....</div>
+</div>
+
+<HR></HR>
+
+<div id="scheduleBox" style="
+background:#fff;
+padding:15px;
+border-radius:12px;
+box-shadow:0 5px 15px rgba(0,0,0,0.08);
+margin-bottom:15px;
+">
+
+<h2>Match Schedule</h2>
+
+<div style="text-align:right;">
+<button onclick="goToSchedule()">➕ CREATE SCHEDULE</button>
+</div>
+
+<div id="scheduleData">Loading...</div>
+
+</div>
+
+<HR></HR>
+
+<div id="teamsBox" style="
+background:#fff;
+padding:15px;
+border-radius:12px;
+box-shadow:0 5px 15px rgba(0,0,0,0.08);
+margin-bottom:15px;
+">
+
+<h2>Registered Teams Details</h2>
+
+<div style="margin-top:10px;text-align:right;">
+<button onclick="goToCreateTeam('create')">➕ REGISTER A TEAM</button>
+</div>
+
+<input type="text" id="search" class="searchBox" placeholder="SEARCH TEAM / MOBILE" onkeyup="filterTable()">
+
+<div class="table-wrap">
+<table id="table">
+</table>
+</div>
+ 
+<div id="editBox" style="display:none">
+
+<input id="e_team" placeholder="TEAM NAME">
+<input id="e_phone" placeholder="PHONE">
+<input id="e_address" placeholder="ADDRESS">
+
+<div id="editPlayers"></div>
+
+<h4>Extra Players</h4>
+<input id="ex1"><input id="ex2"><input id="ex3"><input id="ex4"><input id="ex5">
+
+<button onclick="update()">UPDATE TEAM</button>
+
+</div>
+
+</div>
+ 
+
+<div id="editPopup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:1000;overflow:auto;">
+<div style="background:#fff;padding:20px;margin:20px;border-radius:10px;">
+<button onclick="closeEdit()">Close</button>
+<div id="editContainer"></div>
+</div>
+</div>
+</div>
+
+
+<script>
+
+const URL="https://script.google.com/macros/s/AKfycbzEvOmEQFL7ie68CWS6zy7i-_i_KM5yl8qayycf_dpwYDC70K8YUXHBqL31hzdj17t5og/exec"; 
+
+let fullData=[];
+let currentIndex=null;
+
+// LOGIN
+function login(){
+
+let userPass = document.getElementById("pass").value;
+
+if(!userPass){
+alert("Enter password");
+return;
+}
+
+// 🔥 STEP 1: VERIFYING
+popup.style.display="flex";
+popupText.innerHTML="⏳ VERIFYING...";
+
+let fd=new FormData();
+fd.append("action","login");
+fd.append("password",userPass);
+
+fetch(URL,{method:"POST",body:fd})
+.then(r=>r.text())
+.then(res=>{
+
+if(res==="SUCCESS"){
+
+// ✅ SAVE SESSION
+localStorage.setItem("isLoggedIn","true");
+localStorage.setItem("lastActivity", Date.now());
+
+// 🔥 HIDE LOGIN
+loginBox.style.display="none";
+panel.style.display="block";
+
+// 🔥 STEP 2: SHOW LOADING DATA
+popupText.innerHTML="⏳ LOADING DATA... PLEASE WAIT";
+
+// 🔥 LOAD ALL DATA (WAIT UNTIL COMPLETE)
+Promise.all([
+    load(),
+    loadSlotValue(),
+    loadSchedule(),
+    new Promise(resolve=>{
+        loadTournament();
+        setTimeout(resolve,500); // small wait for DOM render
+    })
+]).then(()=>{
+
+    // 🔥 HIDE LOADER AFTER ALL COMPLETE
+    popup.style.display="none";
+
+});
+
+}else{
+
+popup.style.display="none";
+alert("❌ WRONG PASSWORD");
+
+}
+
+})
+.catch(()=>{
+popup.style.display="none";
+alert("❌ SERVER ERROR");
+});
+}
+
+// LOAD TEAMS
+function load(){
+return new Promise((resolve)=>{
+
+let fd=new FormData();
+fd.append("action","get");
+
+fetch(URL,{method:"POST",body:fd})
+.then(r=>r.json())
+.then(data=>{
+fullData=data;
+
+let html=`<tr>
+<th style="width:5%">SL</th>
+<th style="width:30%">TEAM NAME</th>
+<th style="width:20%">PHONE</th>
+<th style="width:25%">ADDRESS</th>
+<th style="width:20%">ACTION</th>
+</tr>`;
+
+data.reverse().forEach((row,i)=>{
+html+=`<tr>
+<td>${i+1}</td>
+<td>${row[0]}</td>
+<td>${row[1]}</td>
+<td>${row[2]}</td>
+<td>
+<button onclick="viewTeam(${i})">View</button>
+<button class="edit" onclick="openEdit(${i})">Edit</button>
+<button class="delete" onclick="del(${i})">Delete</button>
+</td>
+</tr>`;
+});
+
+table.innerHTML=html;
+resolve();
+})
+.catch(()=>{
+resolve(); // ✅ ADD THIS HERE
+});
+}); 
+}
+
+// LOAD SLOT VALUE
+function loadSlotValue(){
+return new Promise((resolve)=>{
+let fd=new FormData();
+fd.append("action","getSlots");
+
+fetch(URL,{method:"POST",body:fd})
+.then(r=>r.text())
+.then(d=>{
+let [c,m]=d.split("/");
+slotInput.value = m;
+resolve();
+})
+.catch(()=>{
+resolve(); // ✅ ADD HERE
+});
+}); 
+}
+
+// UPDATE SLOT
+function updateSlots(){
+
+let slots = slotInput.value;
+
+if(!slots || slots<=0){
+alert("Enter valid slot");
+return;
+}
+
+popup.style.display="flex";
+popupText.innerHTML="⏳ UPDATING SLOTS...";
+
+let fd=new FormData();
+fd.append("action","setSlots");
+fd.append("slots",slots);
+
+fetch(URL,{method:"POST",body:fd})
+.then(r=>r.text())
+.then(res=>{
+setTimeout(()=>{
+popup.style.display="none";
+
+if(res=="SLOTS_UPDATED"){
+alert("✅ SLOTS UPDATED");
+loadSlotValue();
+}else{
+alert("❌ FAILED");
+}
+
+},2000);
+});
+}
+
+// EDIT
+function edit(i){
+currentIndex=i;
+let row=fullData[i];
+
+editBox.style.display="block";
+
+e_team.value=row[0];
+e_phone.value=row[1];
+e_address.value=row[2];
+
+let html="";
+let idx=3;
+
+for(let p=1;p<=11;p++){
+html+=`<div class="player">
+<input id="pn${p}" value="${row[idx++]||""}">
+<input id="pa${p}" value="${row[idx++]||""}">
+<select id="pp${p}">
+<option ${row[idx]=="PLAYER"?"selected":""}>PLAYER</option>
+<option ${row[idx]=="CAPTAIN"?"selected":""}>CAPTAIN</option>
+<option ${row[idx]=="VICE CAPTAIN"?"selected":""}>VICE CAPTAIN</option>
+</select>
+</div>`;
+idx++;
+}
+
+editPlayers.innerHTML=html;
+
+ex1.value=row[idx++]||"";
+ex2.value=row[idx++]||"";
+ex3.value=row[idx++]||"";
+ex4.value=row[idx++]||"";
+ex5.value=row[idx++]||"";
+}
+
+// UPDATE TEAM
+function update(){
+
+popup.style.display="flex";
+popupText.innerHTML="⏳ UPDATING TEAM...";
+
+let fd=new FormData();
+fd.append("action","update");
+fd.append("index",currentIndex);
+
+fd.append("team_name",e_team.value);
+fd.append("phone",e_phone.value);
+fd.append("address",e_address.value);
+
+for(let i=1;i<=11;i++){
+fd.append("p"+i+"_name",document.getElementById("pn"+i).value);
+fd.append("p"+i+"_age",document.getElementById("pa"+i).value);
+fd.append("p"+i+"_pos",document.getElementById("pp"+i).value);
+}
+
+fd.append("extra1",ex1.value);
+fd.append("extra2",ex2.value);
+fd.append("extra3",ex3.value);
+fd.append("extra4",ex4.value);
+fd.append("extra5",ex5.value);
+
+fetch(URL,{method:"POST",body:fd})
+.then(r=>r.text())
+.then(res=>{
+setTimeout(()=>{
+popup.style.display="none";
+
+if(res=="UPDATED"){
+alert("✅ TEAM UPDATED");
+editBox.style.display="none";
+
+/* 🔥 CLOSE POPUP */
+document.getElementById("editPopup").style.display="none";
+}else{
+alert("❌ UPDATE FAILED");
+}
+
+load();
+},3000);
+});
+}
+
+// DELETE
+function del(i){
+
+if(!confirm("Delete team?")) return;
+
+popup.style.display="flex";
+popupText.innerHTML="⏳ DELETING TEAM...";
+
+let fd=new FormData();
+fd.append("action","delete");
+fd.append("index",i);
+
+fetch(URL,{method:"POST",body:fd})
+.then(()=>{
+setTimeout(()=>{
+popup.style.display="none";
+alert("✅ TEAM DELETED");
+load();
+},2000);
+});
+}
+
+function filterTable(){
+let input=document.getElementById("search").value.toUpperCase();
+let rows=document.querySelectorAll("#table tr");
+
+rows.forEach((row,i)=>{
+if(i===0) return;
+
+let text=row.innerText.toUpperCase();
+
+row.style.display = text.includes(input) ? "" : "none";
+});
+}
+
+document.getElementById("pass").addEventListener("keypress",function(e){
+if(e.key==="Enter"){
+login();
+}
+});
+
+
+function openEdit(i){
+currentIndex=i;
+document.getElementById("editPopup").style.display="block";
+
+// reuse your existing edit function
+edit(i);
+
+// move editBox into popup
+document.getElementById("editContainer").appendChild(editBox);
+}
+
+function closeEdit(){
+document.getElementById("editPopup").style.display="none";
+}
+
+function logout(){
+localStorage.clear();
+location.reload();
+}
+
+
+function clearAll(){
+
+let pass = prompt("ENTER CLEAR PASSWORD");
+
+if(pass !== "MHCC@CLEAR"){
+alert("❌ WRONG PASSWORD");
+return;
+}
+
+if(!confirm("DELETE ALL TEAM DATA?")) return;
+
+popup.style.display="flex";
+popupText.innerHTML="⏳ CLEARING ALL DATA...";
+
+let fd=new FormData();
+fd.append("action","clearAll");
+
+fetch(URL,{method:"POST",body:fd})
+.then(r=>r.text())
+.then(res=>{
+setTimeout(()=>{
+popup.style.display="none";
+alert("✅ ALL DATA CLEARED");
+load();
+},2000);
+});
+}
+</script>
+
+<script>
+    function viewTeam(i){
+
+let row = fullData[i];
+
+let win = window.open("", "_blank");
+
+let html = `
+<html>
+<head>
+<title>Team Details</title>
+
+<style>
+body{
+font-family:Arial;
+padding:20px;
+font-size:13px;
+position:relative;
+}
+
+.logo{
+display:block;
+margin:auto;
+width:100px;
+margin-bottom:5px;
+}
+
+h2{
+text-align:center;
+margin:5px 0;
+}
+
+.info{
+margin-bottom:10px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+font-size:12px;
+}
+
+th,td{
+border:1px solid #ccc;
+padding:6px;
+text-align:left;
+}
+
+th{
+background:#0b1f5c;
+color:#fff;
+}
+
+/* SIGNATURE */
+.sign{
+margin-top:50px;
+display:flex;
+justify-content:space-between;
+align-items:flex-end;
+}
+
+.sign div{
+width:45%;
+text-align:center;
+}
+
+.line{
+margin:30px auto 5px auto;
+width:80%;
+border-top:1px solid #000;
+}
+
+/* PRINT BUTTON POSITION */
+.printBtn{
+position:absolute;
+top:20px;
+right:20px;
+padding:8px 15px;
+background:#0b1f5c;
+color:#fff;
+border:none;
+border-radius:6px;
+cursor:pointer;
+font-size:12px;
+}
+
+/* HIDE WHEN PRINT */
+@media print{
+.printBtn{
+display:none;
+}
+}
+</style>
+
+</head>
+<body>
+
+<img src="https://i.postimg.cc/8kvfTgrb/about1.png" class="logo">
+<button onclick="window.print()" class="printBtn">
+🖨 PRINT
+</button>
+
+<h2>MAA HARACHANDI CRICKET CLUB (JUGALA)</h2>
+<hr>
+<h3 style="text-align:center;">TEAM DETAILS</h3>
+<hr>
+<br>
+
+<div class="info" style="
+text-align:center;">
+
+<div style="font-size:16px;font-weight:700;color:#0b1f5c;margin-bottom:10px;">
+Team Name: ${row[0]}
+</div>
+
+<div style="font-size:14px;color:#333;">
+📞 <b>Phone:</b> ${row[1]} 
+&nbsp;&nbsp; | &nbsp;&nbsp;
+📍 <b>Address:</b> ${row[2]}
+</div>
+
+</div>
+
+<h4>Players Details</h4>
+
+<table>
+<tr>
+<th>Name</th>
+<th>Age</th>
+<th>Role</th>
+</tr>
+`;
+
+let idx=3;
+
+for(let p=1;p<=11;p++){
+html+=`<tr>
+<td>${row[idx++]}</td>
+<td>${row[idx++]}</td>
+<td>${row[idx++]}</td>
+</tr>`;
+}
+
+html+=`</table>
+
+<h4>Extra Players Details</h4>
+<table>
+<tr><th>Name</th><th>Age</th></tr>
+`;
+
+for(let e=1;e<=5;e++){
+let name=row[idx++]||"";
+if(name){
+html+=`<tr><td>${name}</td><td> </td></tr>`;
+}
+}
+
+html+=`</table>
+
+<div class="sign" style="
+display:flex;
+justify-content:space-between;
+align-items:flex-end;
+margin-top:80px;
+">
+
+<!-- LEFT SIGN -->
+<div style="
+width:45%;
+text-align:center;
+">
+
+    <div style="
+    border-top:1px solid #000;
+    width:50%;
+    margin:0 auto 5px;
+    "></div>
+
+    <div style="
+    text-align:center;
+    width:100%;
+    display:block;
+    white-space:nowrap;
+    ">
+Captain Signature
+</div>
+
+</div>
+
+<!-- RIGHT SIGN -->
+<div style="
+width:45%;
+text-align:center;
+display:flex;
+flex-direction:column;
+justify-content:flex-end;
+align-items:center;
+">
+
+    <div style="
+    font-family:'Brush Script MT',cursive;
+    font-size:14px;
+    white-space:nowrap;
+    ">
+    Maa Harachandi Cricket Club
+    </div>
+
+    <div style="
+    border-top:1px solid #000;
+    width:50%;
+    margin:5px auto;
+    "></div>
+
+    <div style="
+    font-size:13px; 
+    letter-spacing:1px;
+    white-space:nowrap;
+    ">
+    MHCC JUGALA
+    </div>
+
+</div>
+
+</div>
+
+</body>
+</html>`;
+
+win.document.write(html);
+win.document.close();
+}
+
+
+function openSlotPopup(){
+document.getElementById("slotPopup").style.display="flex";
+document.getElementById("slotInputPopup").value = slotInput.value;
+}
+
+function closeSlotPopup(){
+document.getElementById("slotPopup").style.display="none";
+}
+
+function saveSlotPopup(){
+slotInput.value = document.getElementById("slotInputPopup").value;
+closeSlotPopup();
+updateSlots();
+}
+
+function redirectPage() {
+    window.location.href = "scoring.html";
+}
+function redirectHome() {
+    window.location.href = "https://mhccjugala.blogspot.com/";
+}
+</script>
+
+<script>
+  function loadTournament(){
+
+let fd=new FormData();
+fd.append("action","getTournament");
+
+fetch(URL,{method:"POST",body:fd})
+.then(r=>r.json())
+.then(data=>{
+
+if(!data || data.length==0){
+document.getElementById("tournamentData").innerHTML="No Tournament Found";
+return;
+}
+
+// latest tournament
+let t = data[data.length-1];
+
+// 🔥 SAVE DATA FOR EDIT PAGE
+localStorage.setItem("editTournament", JSON.stringify({
+    name: t[0],
+    date: t[1],
+    time: t[2],
+    fees: t[3],
+    teams: t[4]
+}));
+
+document.getElementById("tournamentData").innerHTML = `
+
+<div class="table-wrap">
+
+<table style="width:100%; border-collapse:collapse;">
+
+<tr style="background:#0b1f5c;color:#fff;">
+<th>Name</th>
+<th>From Date</th>
+<th>To Date</th>
+<th>Time</th>
+<th>Entry Fees</th>
+<th>Teams Allowed</th> 
+<th>Action</th>
+</tr>
+
+<tr>
+<td>${t[0]}</td>
+<td>${formatFromDate(t[1])}</td>
+<td>${formatToDate(t[1])}</td>
+<td>${formatTime(t[2])}</td>
+<td>₹${t[3]}</td>
+<td>${t[4]}</td> 
+<td>
+<button class="edit" onclick="goToCreateMatch('edit')">Edit</button>
+<button class="delete" onclick="deleteTournament()">Delete</button>
+</td>
+</tr>
+
+</table>
+</div>
+
+`;
+
+});
+}
+
+function formatTime(val){
+try{
+let d = new Date(val);
+return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+}catch{
+return val;
+}
+}
+
+function deleteTournament(){
+
+if(!confirm("Delete tournament?")) return;
+
+// 🔥 SHOW LOADER
+popup.style.display="flex";
+popupText.innerHTML="⏳ DELETING TOURNAMENT...";
+
+let fd=new FormData();
+fd.append("action","deleteTournament");
+
+fetch(URL,{method:"POST",body:fd})
+.then(()=>{
+
+setTimeout(()=>{
+popup.style.display="none";
+alert("✅ TOURNAMENT DELETED");
+loadTournament();
+},500);
+
+});
+}
+ 
+function formatFromDate(val){
+try{
+let parts = val.split(" to ");
+let d = new Date(parts[0]);
+
+let day = d.getDate().toString().padStart(2,'0');
+let months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+let month = months[d.getMonth()];
+let year = d.getFullYear();
+
+return `${day}/${month}/${year}`;
+}catch{
+return "-";
+}
+}
+
+function formatToDate(val){
+try{
+let parts = val.split(" to ");
+let d = new Date(parts[1]);
+
+let day = d.getDate().toString().padStart(2,'0');
+let months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+let month = months[d.getMonth()];
+let year = d.getFullYear();
+
+return `${day}/${month}/${year}`;
+}catch{
+return "-";
+}
+}
+</script>
+
+<script>
+
+let tournamentIndex = null;
+ 
+function goToCreateMatch(type){
+
+    if(type === "create"){
+        localStorage.removeItem("editTournament");
+    }
+
+    window.location.href = "creatematch.html";
+}
+
+function goToCreateTeam(type){
+  window.open("mhcc-reg.html", "_blank", "noopener,noreferrer");
+}
+
+
+// 🔥 AUTO LOGIN ON REFRESH
+window.onload = function(){
+
+let isLoggedIn = localStorage.getItem("isLoggedIn");
+
+if(isLoggedIn === "true"){
+
+// 🔥 SHOW LOADER
+popup.style.display="flex";
+popupText.innerHTML="⏳ LOADING DATA... PLEASE WAIT";
+
+loginBox.style.display="none";
+panel.style.display="block";
+
+// update activity
+localStorage.setItem("lastActivity", Date.now());
+
+// 🔥 WAIT FOR ALL DATA
+Promise.all([
+    load(),
+    loadSlotValue(),
+    loadSchedule(),
+    new Promise(resolve=>{
+        loadTournament();
+        setTimeout(resolve,500);
+    })
+]).then(()=>{
+
+    // 🔥 HIDE LOADER AFTER LOAD
+    popup.style.display="none";
+
+});
+
+}
+
+// 🔥 START ACTIVITY TRACK
+startActivityTracking();
+};
+
+function startActivityTracking(){
+
+// update activity on user actions
+["click","mousemove","keypress","scroll"].forEach(event=>{
+document.addEventListener(event, ()=>{
+localStorage.setItem("lastActivity", Date.now());
+});
+});
+
+// check inactivity
+setInterval(()=>{
+let last = localStorage.getItem("lastActivity");
+
+if(last){
+let diff = Date.now() - last;
+
+// 30 min = 1800000 ms
+if(diff > 1800000){
+alert("⏳ Session expired. Logging out.");
+logout();
+}
+}
+
+},60000); // check every 1 min
+
+}
+
+
+function loadSchedule(){
+
+let fd=new FormData();
+fd.append("action","getSchedule");
+
+fetch(URL,{method:"POST",body:fd})
+.then(r=>r.json())
+.then(data=>{
+
+// ✅ ADD THIS LINE HERE
+window.scheduleData = data;
+
+let html = `
+<div class="table-wrap">
+<table>
+
+<tr>
+<th>SL</th>
+<th>TOURNAMENT</th>
+<th>DATE</th>
+<th>MATCHES</th>
+<th>ACTION</th>
+</tr>
+`;
+
+data.slice(1).reverse().forEach((r,i)=>{
+
+html += `
+<tr>
+<td>${i+1}</td>
+<td>${r[0]}</td>
+<td>${formatDate(r[1])}</td>
+<td style="white-space:pre-line; line-height:1.6; vertical-align:top;">${r.slice(2).join("\n")}</td>
+<td>
+<button onclick="viewSchedule(${i})">View</button>
+<button class="edit" onclick="editSchedule(${i})">Edit</button>
+<button class="delete" onclick="deleteSchedule(${data.length - 2 - i})">Delete</button>
+</td>
+</tr>
+`;
+});
+
+html += `</table></div>`;
+
+document.getElementById("scheduleData").innerHTML = html;
+
+});
+}
+</script>
+
+<script>
+  // ❌ RIGHT CLICK DISABLE
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+// ❌ DEVTOOLS SHORTCUT BLOCK
+document.addEventListener("keydown", function(e){
+
+let key = e.key.toUpperCase();
+
+if(
+key === "F12" ||
+(e.ctrlKey && e.shiftKey && ["I","C","J"].includes(key)) ||
+(e.ctrlKey && key === "U")
+){
+e.preventDefault();
+}
+
+});
+
+// 🔥 AUTO REFRESH DATA EVERY 5 SEC (ONLY IF LOGGED IN)
+setInterval(()=>{
+
+let isLoggedIn = localStorage.getItem("isLoggedIn");
+
+if(isLoggedIn === "true"){
+    load();
+    loadSlotValue();
+    loadTournament();
+}
+
+},5000);
+
+function goToSchedule(){
+window.location.href = "createschedule.html";
+}
+
+
+function formatDate(d){
+try{
+let date = new Date(d);
+let day = date.getDate().toString().padStart(2,'0');
+let month = date.toLocaleString('default',{month:'short'});
+let year = date.getFullYear();
+return `${day}/${month}/${year}`;
+}catch{
+return d;
+}
+}
+</script>
+
+<script>
+  function viewSchedule(i){
+
+let data = window.scheduleData; // store globally
+
+let row = data[data.length - 1 - i];
+
+let win = window.open("", "_blank");
+
+let html = `
+<html>
+<head>
+<title>Schedule View</title>
+<style>
+body{font-family:Arial;padding:20px;}
+h2{text-align:center;}
+table{width:100%;border-collapse:collapse;}
+td,th{border:1px solid #ccc;padding:8px;}
+th{background:#0b1f5c;color:#fff;}
+</style>
+</head>
+<body>
+
+<h2>${row[0]}</h2>
+<p><b>Date:</b> ${row[1]}</p>
+
+<table>
+<tr><th>Matches</th></tr>
+`;
+
+row.slice(2).forEach(m=>{
+if(m) html += `<tr><td>${m}</td></tr>`;
+});
+
+html += `</table></body></html>`;
+
+win.document.write(html);
+win.document.close();
+}
+
+function viewSchedule(i){
+
+let data = window.scheduleData; // store globally
+
+let row = data[data.length - 1 - i];
+
+let win = window.open("", "_blank");
+
+let html = `
+<html>
+<head>
+<title>Schedule View</title>
+<style>
+body{font-family:Arial;padding:20px;}
+h2{text-align:center;}
+table{width:100%;border-collapse:collapse;}
+td,th{border:1px solid #ccc;padding:8px;}
+th{background:#0b1f5c;color:#fff;}
+</style>
+</head>
+<body>
+
+<h2>${row[0]}</h2>
+<p><b>Date:</b> ${row[1]}</p>
+
+<table>
+<tr><th>Matches</th></tr>
+`;
+
+row.slice(2).forEach(m=>{
+if(m) html += `<tr><td>${m}</td></tr>`;
+});
+
+html += `</table></body></html>`;
+
+win.document.write(html);
+win.document.close();
+}
+
+function editSchedule(i){
+
+let data = window.scheduleData;
+let row = data[data.length - 1 - i];
+
+// 🔥 SAVE TO LOCAL STORAGE
+localStorage.setItem("editSchedule", JSON.stringify({
+data: row,
+index: data.length - 2 - i
+}));
+ 
+
+// 🔥 REDIRECT
+window.location.href = "createschedule.html";
+}
+
+function deleteSchedule(i){
+
+if(!confirm("Delete this schedule?")) return;
+
+// 🔥 LOADER
+document.getElementById("popup").style.display="flex";
+document.getElementById("popupText").innerText="⏳ DELETING...";
+
+let fd=new FormData();
+fd.append("action","deleteSchedule");
+fd.append("index",i);
+
+fetch(URL,{method:"POST",body:fd})
+.then(r=>r.text())
+.then(res=>{
+
+document.getElementById("popup").style.display="none";
+
+alert("✅ Deleted");
+loadSchedule();
+
+})
+.catch(()=>{
+document.getElementById("popup").style.display="none";
+alert("❌ Failed");
+});
+}
+</script>
+
+<div id="slotPopup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:2000;justify-content:center;align-items:center;">
+
+<div style="background:#fff;padding:20px;border-radius:12px;width:90%;max-width:300px;text-align:center;">
+
+<h3>Update Slots</h3>
+
+<input type="number" id="slotInputPopup" placeholder="Enter total slots">
+
+<button onclick="saveSlotPopup()">UPDATE</button>
+<button onclick="closeSlotPopup()" style="background:#ccc;color:#000;margin-top:5px;">CANCEL</button>
+
+</div>
+</div>
+
+</body>
+</html>
