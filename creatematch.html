@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Create Tournament</title>
+
+<style>
+:root{
+  --brand:#0b1f5c;
+}
+
+/* GLOBAL */
+*{
+  box-sizing:border-box;
+  font-family:system-ui,Arial;
+}
+
+body{
+  margin:0;
+  background:#fff;
+}
+
+/* CONTAINER (SAME AS REGISTRATION) */
+.container{
+width:100%;
+max-width:100%;
+padding:15px;
+background:#fff;
+}
+
+/* LOGO */
+.logo{
+display:block;
+width:100%;
+max-width:180px;
+margin:0 auto 15px auto;
+}
+
+/* HEADER */
+h2{
+text-align:center;
+color:var(--brand);
+margin-bottom:10px;
+}
+
+/* INPUT STYLE SAME */
+input,select{
+width:100%;
+padding:14px 12px;
+margin:10px 0;
+border-radius:10px;
+border:1px solid #ddd;
+font-size:15px;
+background:#fafafa;
+text-transform:uppercase;
+transition:0.2s;
+}
+
+/* FOCUS */
+input:focus,select:focus{
+border-color:var(--brand);
+background:#fff;
+box-shadow:0 0 0 2px rgba(11,31,92,0.08);
+outline:none;
+}
+
+/* BUTTON */
+button{
+background:var(--brand);
+color:#fff;
+padding:14px;
+border:none;
+border-radius:10px;
+width:100%;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+margin-top:15px;
+}
+
+button:hover{
+background:#091847;
+}
+
+/* SECTION TITLE */
+h3{
+margin-top:15px;
+color:var(--brand);
+}
+
+/* POPUP */
+#popup{
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.7);
+color:#fff;
+display:none;
+align-items:center;
+justify-content:center;
+text-align:center;
+flex-direction:column;
+z-index:999;
+}
+
+.loader{
+border:5px solid #f3f3f3;
+border-top:5px solid #f1c40f;
+border-radius:50%;
+width:40px;
+height:40px;
+animation:spin 1s linear infinite;
+margin-bottom:15px;
+}
+
+@keyframes spin{
+100%{transform:rotate(360deg);}
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOADER -->
+<div id="popup">
+<div class="loader"></div>
+<div id="popupText">⏳ PLEASE WAIT...</div>
+</div>
+
+<div class="container">
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+
+<img src="https://i.postimg.cc/8kvfTgrb/about1.png" class="logo" style="margin:0;max-width:140px;">
+
+<button onclick="goAdmin()" style="
+width:auto;
+padding:10px 14px;
+font-size:13px;
+border-radius:8px;
+background:linear-gradient(135deg,#141e30,#243b55);
+">
+🏠 GO TO ADMIN
+</button>
+
+</div>
+
+<h2>🏏TOURNAMENT FORM</h2>
+
+<hr>
+
+<h3>🏏 Tournament Name</h3>
+<input id="name" placeholder="TOURNAMENT NAME" required>
+
+<h3>📅 Date Details</h3>
+<input type="date" id="fromDate" required>
+<input type="date" id="toDate" required>
+
+<h3>⏰ Match Time</h3>
+<select id="time" required>
+<option>07:00 PM</option>
+<option>08:00 PM</option>
+<option>09:00 PM</option>
+<option>10:00 PM</option>
+</select>
+
+<h3>💰 Tournament Info</h3>
+<input id="fees" placeholder="ENTRY FEES" required>
+<input id="teams" placeholder="NUMBER OF TEAMS" required>
+
+<h3>📍 Venue</h3>
+<select id="venue" required>
+<option>JUGAL PLAY GROUND</option>
+<option>MHCC JUGALA PLAY GROUND</option>
+</select>
+
+<button onclick="save()">CREATE TOURNAMENT</button>
+
+</div>
+
+<script>
+
+const URL="https://script.google.com/macros/s/AKfycbzEvOmEQFL7ie68CWS6zy7i-_i_KM5yl8qayycf_dpwYDC70K8YUXHBqL31hzdj17t5og/exec";
+
+function save(){
+
+// ✅ NAME VALIDATION
+if(!document.getElementById("name").value){
+alert("⚠️ ENTER TOURNAMENT NAME");
+return;
+}
+
+// ✅ VALIDATION
+if(!fromDate.value || !toDate.value || !time.value || !fees.value || !teams.value || !venue.value){
+alert("⚠️ ALL FIELDS ARE REQUIRED");
+return;
+}
+
+// ✅ DATE CHECK
+if(fromDate.value > toDate.value){
+alert("⚠️ FROM DATE SHOULD BE BEFORE TO DATE");
+return;
+}
+
+// ✅ TEAM NUMBER CHECK
+if(teams.value <= 0){
+alert("⚠️ ENTER VALID NUMBER OF TEAMS");
+return;
+}
+
+// 🔥 SHOW LOADER
+popup.style.display="flex";
+let editData = localStorage.getItem("editTournament");
+
+// 🔥 LOADER TEXT FIX
+if(editData){
+popupText.innerHTML="⏳ UPDATING TOURNAMENT...";
+}else{
+popupText.innerHTML="⏳ CREATING TOURNAMENT...";
+}
+
+popup.style.display="flex";
+
+let fd=new FormData();
+
+if(editData){
+fd.append("action","updateTournament");
+}else{
+fd.append("action","addTournament");
+}
+
+// DATE FORMAT
+let date = fromDate.value + " to " + toDate.value;
+
+fd.append("name",document.getElementById("name").value);
+fd.append("date",date);
+fd.append("time",time.value);
+fd.append("fees",fees.value);
+fd.append("teams",teams.value);
+fd.append("venue",venue.value);
+
+// 🔥 IMPORTANT → SEND SLOT VALUE
+fd.append("slots",teams.value);
+
+fetch(URL,{method:"POST",body:fd})
+.then(r=>r.text())
+.then(res=>{
+popup.style.display="none";
+
+// 🔥 HANDLE BOTH CREATE + UPDATE
+if(res=="TOURNAMENT_ADDED"){
+alert("✅ TOURNAMENT CREATED");
+localStorage.removeItem("editTournament");
+window.location.href = "admin.html";
+}
+else if(res=="UPDATED"){
+alert("✅ TOURNAMENT UPDATED");
+localStorage.removeItem("editTournament");
+window.location.href = "admin.html";
+}
+else{
+alert("❌ FAILED");
+}
+});
+
+}
+
+// 🔥 AUTO UPPERCASE FOR ALL INPUTS
+document.addEventListener("input", function(e){
+
+let el = e.target;
+
+// apply only to input fields (skip date)
+if(el.tagName === "INPUT" || el.tagName === "TEXTAREA"){
+
+if(el.type === "date") return;
+
+// keep cursor position
+let start = el.selectionStart;
+let end = el.selectionEnd;
+
+el.value = el.value.toUpperCase();
+
+el.setSelectionRange(start, end);
+}
+
+});
+
+
+window.onload = function(){
+
+let data = localStorage.getItem("editTournament");
+
+if(data){
+
+let t = JSON.parse(data);
+
+// 🔥 SPLIT DATE
+let dates = ["",""];
+
+if(t.date && t.date.includes(" to ")){
+dates = t.date.split(" to ");
+}
+
+document.getElementById("name").value = t.name;
+document.getElementById("fromDate").value = dates[0];
+document.getElementById("toDate").value = dates[1];
+let timeVal = t.time || "";
+
+if(timeVal.includes("07")) document.getElementById("time").value="07:00 PM";
+else if(timeVal.includes("08")) document.getElementById("time").value="08:00 PM";
+else if(timeVal.includes("09")) document.getElementById("time").value="09:00 PM";
+else if(timeVal.includes("10")) document.getElementById("time").value="10:00 PM";
+document.getElementById("fees").value = t.fees;
+document.getElementById("teams").value = t.teams;
+document.getElementById("venue").value = t.venue;
+ 
+
+}
+}
+
+
+function goAdmin(){
+window.location.href = "admin.html";
+}
+</script>
+
+</body>
+</html>

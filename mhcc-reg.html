@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Team Registration</title>
+
+<style>
+:root{
+  --brand:#0b1f5c;
+}
+
+/* GLOBAL */
+*{
+  box-sizing:border-box;
+  font-family:system-ui,Arial;
+}
+ 
+
+/* CONTAINER */
+.container{
+width:100%;
+max-width:100%;
+margin:0;
+padding:15px;
+border-radius:0;
+box-shadow:none;
+background:#fff;
+}
+
+/* HEADER */
+h2{
+text-align:center;
+color:var(--brand);
+margin-bottom:10px;
+}
+
+/* INPUT STYLE (MODERN) */
+input,select,textarea{
+width:100%;
+padding:14px 12px;
+margin:10px 0;
+border-radius:10px;
+border:1px solid #ddd;
+font-size:15px;
+background:#fafafa;
+text-transform:uppercase;
+transition:0.2s;
+}
+
+/* FOCUS EFFECT */
+input:focus,select:focus,textarea:focus{
+border-color:var(--brand);
+background:#fff;
+box-shadow:0 0 0 2px rgba(11,31,92,0.08);
+outline:none;
+}
+
+/* PLAYER GRID */
+.player-row{
+display:grid;
+grid-template-columns:2fr 1fr 1.5fr;
+gap:10px;
+margin-bottom:5px;
+}
+
+/* BUTTON */
+button{
+background:var(--brand);
+color:#fff;
+padding:14px;
+border:none;
+border-radius:10px;
+width:100%;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+margin-top:15px;
+}
+
+button:hover{
+background:#091847;
+}
+
+/* SLOT */
+.slot{
+text-align:center;
+font-weight:bold;
+margin-bottom:10px;
+font-size:18px;
+color:#e74c3c;
+}
+
+/* POPUP */
+#popup{
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.7);
+color:#fff;
+display:none;
+align-items:center;
+justify-content:center;
+text-align:center;
+flex-direction:column;
+z-index:999;
+}
+
+.loader{
+border:5px solid #f3f3f3;
+border-top:5px solid #f1c40f;
+border-radius:50%;
+width:40px;
+height:40px;
+animation:spin 1s linear infinite;
+margin-bottom:15px;
+}
+
+@keyframes spin{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
+
+@media(max-width:600px){
+.container{
+padding:12px;
+}
+}
+
+.logo{
+display:block;
+width:100%;
+max-width:180px;
+margin:0 auto 15px auto;
+}
+
+
+/* THANK YOU POPUP */
+#thankPopup{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.7);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:1000;
+}
+
+.thank-box{
+background:#fff;
+padding:25px;
+border-radius:12px;
+text-align:center;
+width:85%;
+max-width:350px;
+animation:pop 0.3s ease;
+}
+
+@keyframes pop{
+0%{transform:scale(0.7);opacity:0;}
+100%{transform:scale(1);opacity:1;}
+}
+
+.thank-title{
+font-size:22px;
+font-weight:bold;
+color:#0b1f5c;
+margin-bottom:10px;
+}
+
+.thank-msg{
+font-size:16px;
+color:#333;
+margin-bottom:15px;
+}
+
+.thank-btn{
+background:#0b1f5c;
+color:#fff;
+border:none;
+padding:10px;
+width:100%;
+border-radius:6px;
+font-size:15px;
+cursor:pointer;
+}
+
+#duplicatePopup{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.7);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:1000;
+}
+</style>
+</head>
+
+<body>
+
+<!-- POPUP -->
+<div id="popup">
+<div class="loader"></div>
+<div id="popupText">⏳ PLEASE WAIT...</div>
+</div>
+
+<div class="container">
+
+<img src="https://i.postimg.cc/8kvfTgrb/about1.png" class="logo">
+
+<h2>MHCC | TEAM REGISTRATION FORM</h2>
+
+<BR></BR>
+<HR></HR>
+
+<div id="slots" class="slot">Loading...</div>
+
+<HR></HR>
+
+<form id="form">
+<h3>Team Details</h3>
+<input id="team_name" placeholder="TEAM NAME *" required autofocus>
+<input type="number" id="phone" placeholder="PHONE *" required>
+<textarea id="address" placeholder="ADDRESS *" required></textarea>
+
+<h3>Players</h3>
+<div id="players"></div>
+
+<h3>Extra Players (Optional)</h3>
+<input id="extra1" placeholder="EXTRA PLAYER 1">
+<input id="extra2" placeholder="EXTRA PLAYER 2">
+<input id="extra3" placeholder="EXTRA PLAYER 3">
+<input id="extra4" placeholder="EXTRA PLAYER 4">
+<input id="extra5" placeholder="EXTRA PLAYER 5">
+
+<button>REGISTER TEAM</button>
+
+</form>
+
+</div>
+
+<script>
+
+const URL="https://script.google.com/macros/s/AKfycbzEvOmEQFL7ie68CWS6zy7i-_i_KM5yl8qayycf_dpwYDC70K8YUXHBqL31hzdj17t5og/exec";
+
+// CREATE PLAYER INPUTS
+let html="";
+for(let i=1;i<=11;i++){
+html+=`<div class="player-row">
+<input id="p${i}_name" placeholder="PLAYER ${i} *" required>
+<input id="p${i}_age" type="number" placeholder="AGE *" required>
+<select id="p${i}_pos" required>
+<option>PLAYER</option>
+<option>CAPTAIN</option>
+<option>VICE CAPTAIN</option>
+</select>
+</div>`;
+}
+document.getElementById("players").innerHTML=html;
+
+// AUTO CONVERT ALL INPUT TO UPPERCASE
+document.addEventListener("input", function(e){
+
+let el = e.target;
+
+// apply only to input & textarea (not number)
+if(el.tagName === "INPUT" || el.tagName === "TEXTAREA"){
+
+// skip number fields
+if(el.type === "number") return;
+
+// convert to uppercase
+let start = el.selectionStart;
+let end = el.selectionEnd;
+
+el.value = el.value.toUpperCase();
+
+// keep cursor position
+el.setSelectionRange(start, end);
+}
+
+});
+
+// LOAD SLOT DATA
+function loadSlots(){
+fetch(URL)
+.then(r=>r.text())
+.then(d=>{
+
+let [c,m]=d.split("/");
+c=parseInt(c);
+m=parseInt(m);
+
+let left = m - c;
+
+// NORMAL SLOT MESSAGE
+if(left > 0){
+document.getElementById("slots").innerText =
+"⚡ HURRY UP! ONLY " + left + " SLOT" + (left>1?"S":"") + " AVAILABLE";
+}
+
+// FULL CONDITION
+if(left <= 0){
+document.getElementById("slots").innerText = "❌ SORRY NO SLOTS AVAILABLE";
+ 
+
+// DISABLE FORM
+document.getElementById("form").style.display="none";
+}
+
+});
+}
+
+loadSlots();
+
+
+// FORM SUBMIT
+form.onsubmit = e=>{
+e.preventDefault();
+
+// ✅ FIRST → CAPTAIN VALIDATION
+let cap=0,vc=0;
+
+for(let i=1;i<=11;i++){
+let pos=document.getElementById("p"+i+"_pos").value;
+if(pos=="CAPTAIN") cap++;
+if(pos=="VICE CAPTAIN") vc++;
+}
+
+if(cap!=1 || vc!=1){
+alert("ONLY 1 CAPTAIN & 1 VICE CAPTAIN REQUIRED");
+return;
+}
+
+// ✅ THEN → SHOW LOADER
+popup.style.display="flex";
+popupText.innerHTML = `
+⏳ PLEASE WAIT......<br>
+⏳ CHECKING TEAM DATA IN OUR DATABASE...
+`;
+
+// 🔥 DUPLICATE CHECK
+let team = team_name.value.trim().toUpperCase();
+let mobile = phone.value.trim();
+
+let fdCheck = new FormData();
+fdCheck.append("action","get");
+
+fetch(URL,{method:"POST",body:fdCheck})
+.then(r=>r.text())
+.then(text=>{
+
+let data;
+
+try{
+data = JSON.parse(text);
+}catch(e){
+popup.style.display="none";
+document.getElementById("duplicatePopup").style.display="flex";
+return;
+}
+
+// ✅ DUPLICATE CHECK
+let duplicate = data.some(row =>
+(row[0] || "").trim().toUpperCase() === team &&
+(row[1] || "").trim() === mobile
+);
+
+if(duplicate){
+popup.style.display="none";
+document.getElementById("duplicatePopup").style.display="flex";
+return;
+}
+
+// ✅ SAFE → SUBMIT
+continueSubmit();
+
+})
+.catch(()=>{
+popup.style.display="none";
+document.getElementById("duplicatePopup").style.display="flex";
+});
+
+return;
+}
+
+
+
+function continueSubmit(){
+
+// 🔥 ADD THIS LINE HERE (VERY FIRST)
+popupText.innerHTML = `
+⏳ REGISTERING TEAM...<br>
+⏳ ଦୟାକରି ଅପେକ୍ଷା କରନ୍ତୁ...
+`;
+
+let cap=0,vc=0;
+
+// VALIDATION
+for(let i=1;i<=11;i++){
+let pos=document.getElementById("p"+i+"_pos").value;
+if(pos=="CAPTAIN") cap++;
+if(pos=="VICE CAPTAIN") vc++;
+}
+
+if(cap!=1 || vc!=1){
+alert("ONLY 1 CAPTAIN & 1 VICE CAPTAIN REQUIRED");
+return;
+}
+
+// SHOW LOADER
+popup.style.display="flex";
+popupText.innerHTML = `
+⏳ PLEASE WAIT... TEAM REGISTRATION IN PROCESS<br>
+⏳ ଦୟାକରି ଅପେକ୍ଷା କରନ୍ତୁ...
+`;
+
+let fd=new FormData();
+fd.append("action","add");
+
+fd.append("team_name",team_name.value);
+fd.append("phone",phone.value);
+fd.append("address",address.value);
+
+for(let i=1;i<=11;i++){
+fd.append("p"+i+"_name",document.getElementById("p"+i+"_name").value);
+fd.append("p"+i+"_age",document.getElementById("p"+i+"_age").value);
+fd.append("p"+i+"_pos",document.getElementById("p"+i+"_pos").value);
+}
+
+fd.append("extra1",extra1.value);
+fd.append("extra2",extra2.value);
+fd.append("extra3",extra3.value);
+fd.append("extra4",extra4.value);
+fd.append("extra5",extra5.value);
+
+fetch(URL,{method:"POST",body:fd})
+.then(r=>r.text())
+.then(res=>{
+setTimeout(()=>{
+popup.style.display="none";
+
+if(res=="SUCCESS"){
+document.getElementById("thankPopup").style.display="flex";
+document.getElementById("thankTitle").innerText =
+"THANK YOU " + team_name.value.toUpperCase();
+form.reset();
+loadSlots();
+
+// 🔥 REDIRECT AFTER 2 SECOND
+setTimeout(()=>{
+window.location.href = "https://mhccjugala.blogspot.com";
+},2000);
+
+}else if(res=="FULL"){
+alert("❌ REGISTRATION CLOSED");
+}else{
+alert("❌ ERROR: "+res);
+}
+
+},3000);
+});
+
+}
+
+function closeThank(){
+document.getElementById("thankPopup").style.display="none";
+}
+
+function closeDuplicate(){
+document.getElementById("duplicatePopup").style.display="none";
+}
+</script>
+
+<div id="thankPopup">
+  <div class="thank-box">
+    <div class="thank-title" id="thankTitle"></div>
+    <div class="thank-msg">
+      FOR JOINING OUR TOURNAMENT
+    </div>
+    <button class="thank-btn" onclick="closeThank()">OK</button>
+  </div>
+</div>
+
+<div id="duplicatePopup">
+  <div class="thank-box">
+    <div class="thank-title" style="color:#e74c3c;">
+      ❌ TEAM ALREADY REGISTERED
+    </div>
+    <div class="thank-msg">
+      PLEASE USE DIFFERENT TEAM NAME
+    </div>
+    <button class="thank-btn" onclick="closeDuplicate()">OK</button>
+  </div>
+</div>
+
+</body>
+</html>

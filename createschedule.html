@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Create Schedule</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<style>
+:root{
+  --brand:#0b1f5c;
+}
+
+/* GLOBAL */
+*{
+  box-sizing:border-box;
+  font-family:system-ui,Arial;
+}
+
+body{
+  margin:0;
+  background:#fff;
+}
+
+/* CONTAINER */
+.container{
+width:100%;
+max-width:100%;
+padding:15px;
+background:#fff;
+}
+
+/* LOGO */
+.logo{
+display:block;
+width:100%;
+max-width:180px;
+margin:0 auto 15px auto;
+}
+
+/* HEADER */
+h2{
+text-align:center;
+color:var(--brand);
+margin-bottom:10px;
+}
+
+/* INPUT */
+input,select{
+width:100%;
+padding:14px 12px;
+margin:10px 0;
+border-radius:10px;
+border:1px solid #ddd;
+font-size:15px;
+background:#fafafa;
+text-transform:uppercase;
+transition:0.2s;
+}
+
+/* FOCUS */
+input:focus,select:focus{
+border-color:var(--brand);
+background:#fff;
+box-shadow:0 0 0 2px rgba(11,31,92,0.08);
+outline:none;
+}
+
+/* BUTTON */
+button{
+background:var(--brand);
+color:#fff;
+padding:14px;
+border:none;
+border-radius:10px;
+width:100%;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+margin-top:10px;
+}
+
+button:hover{
+background:#091847;
+}
+
+/* MATCH ROW */
+.match{
+display:flex;
+gap:8px;
+align-items:center;
+margin-bottom:8px;
+}
+
+.match select{
+flex:1;
+}
+
+.match span{
+font-weight:bold;
+}
+
+/* REMOVE BUTTON */
+.match button{
+background:red;
+width:auto;
+padding:8px 10px;
+font-size:12px;
+}
+
+/* SECTION */
+h3{
+margin-top:15px;
+color:var(--brand);
+}
+
+/* POPUP */
+#popup{
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.7);
+color:#fff;
+display:none;
+align-items:center;
+justify-content:center;
+text-align:center;
+flex-direction:column;
+z-index:999;
+}
+
+.loader{
+border:5px solid #f3f3f3;
+border-top:5px solid #f1c40f;
+border-radius:50%;
+width:40px;
+height:40px;
+animation:spin 1s linear infinite;
+margin-bottom:15px;
+}
+
+@keyframes spin{
+100%{transform:rotate(360deg);}
+}
+</style>
+</head>
+
+<body> 
+        <div id="popup" style="
+        position:fixed;
+        top:0;left:0;
+        width:100%;height:100%;
+        background:rgba(0,0,0,0.7);
+        color:#fff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        flex-direction:column;
+        z-index:9999;
+        ">
+
+        <div style="
+        border:5px solid #f3f3f3;
+        border-top:5px solid #f1c40f;
+        border-radius:50%;
+        width:45px;
+        height:45px;
+        animation:spin 1s linear infinite;
+        margin-bottom:15px;
+        "></div>
+
+        <div id="popupText">⏳ LOADING TEAMS...</div>
+        </div> 
+
+<div class="container">
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+
+<img src="https://i.postimg.cc/8kvfTgrb/about1.png" class="logo" style="margin:0;max-width:140px;">
+
+<button onclick="goAdmin()" style="
+width:auto;
+padding:10px 14px;
+font-size:13px;
+border-radius:8px;
+background:linear-gradient(135deg,#141e30,#243b55);
+">
+🏠 GO TO ADMIN
+</button>
+
+</div>
+
+<h2>📅 MATCH SCHEDULE FORM</h2>
+
+<hr>
+
+<h3>🏏 Tournament Name</h3>
+<input id="t_name" readonly>
+
+<h3>📅 Match Date</h3>
+<input type="date" id="m_date">
+
+<h3>🏏 Match List</h3>
+
+<div id="matches"></div>
+
+<button onclick="saveSchedule()">💾 SAVE SCHEDULE</button>
+
+</div>
+
+<script>
+const URL="https://script.google.com/macros/s/AKfycbzEvOmEQFL7ie68CWS6zy7i-_i_KM5yl8qayycf_dpwYDC70K8YUXHBqL31hzdj17t5og/exec";
+
+let teams=[];
+
+// LOAD TEAMS + TOURNAMENT
+window.onload = function(){
+
+  // ✅ SET TODAY DATE
+let today = new Date().toISOString().split("T")[0];
+document.getElementById("m_date").value = today;
+
+// 🔥 SHOW LOADER
+document.getElementById("popup").style.display="flex";
+
+// get tournament
+let t = JSON.parse(localStorage.getItem("editTournament") || "null");
+
+// 🔥 FIX TOURNAMENT NAME
+if(t){
+if(t.name){
+t_name.value = t.name;
+}else if(Array.isArray(t)){
+t_name.value = t[0] || "";
+}else{
+t_name.value = "";
+}
+}else{
+t_name.value = "";
+}
+// load teams
+let fd=new FormData();
+fd.append("action","get");
+
+fetch(URL,{method:"POST",body:fd})
+.then(r=>r.text())
+.then(txt=>{
+let data;
+
+try{
+data = JSON.parse(txt);
+}catch{
+alert("Error loading teams");
+document.getElementById("popup").style.display="none";
+return;
+}
+
+if(!data || data.length==0){
+alert("No team data found");
+document.getElementById("popup").style.display="none";
+return;
+}
+
+// ✅ TEAM LIST
+teams = data.map(row=>row[0]);
+
+// 🔥 CREATE 8 FIXED MATCH ROWS
+let container = document.getElementById("matches");
+container.innerHTML = "";
+
+for(let i=1;i<=8;i++){
+let div = document.createElement("div");
+div.className = "match";
+
+div.innerHTML = `
+<select onchange="checkDuplicate(this)">
+<option value="">SELECT TEAM</option>
+${teamOptions()}
+</select>
+
+<span>VS</span>
+
+<select onchange="checkDuplicate(this)">
+<option value="">SELECT TEAM</option>
+${teamOptions()}
+</select>
+`;
+
+container.appendChild(div);
+}
+
+// ✅ EDIT MODE FIX
+let editObj = JSON.parse(localStorage.getItem("editSchedule") || "null");
+let edit = editObj ? editObj.data : null;
+ 
+if(edit){
+if(edit && edit.length > 2){
+
+t_name.value = edit[0] || "";
+
+// fix date
+let d = new Date(edit[1]);
+m_date.value = d.toISOString().split("T")[0];
+
+setTimeout(()=>{
+
+let container = document.getElementById("matches");
+let rows = container.querySelectorAll(".match");
+
+edit.slice(2).forEach((m,index)=>{
+if(!m || !rows[index]) return;
+
+let parts = m.split(/VS/i).map(x => x.trim());
+
+let s = rows[index].querySelectorAll("select");
+
+s[0].value = parts[0] || "";
+s[1].value = parts[1] || "";
+});
+
+},200);  
+}
+}
+
+// 🔥 HIDE LOADER
+document.getElementById("popup").style.display="none";
+
+})
+.catch(()=>{
+document.getElementById("popup").style.display="none";
+});
+ 
+
+};
+
+ 
+function checkDuplicate(el){
+
+let matches = document.querySelectorAll(".match");
+
+let pairs = [];
+
+for(let m of matches){
+
+let s = m.querySelectorAll("select");
+
+let t1 = s[0].value;
+let t2 = s[1].value;
+
+// ✅ SKIP EMPTY (IMPORTANT FIX)
+if(!t1 || !t2) continue;
+
+// 🔥 BLOCK SAME TEAM
+if(t1 === t2){
+alert("❌ Same team cannot play against itself");
+el.value = "";
+return;
+}
+
+// 🔥 normalize pair
+let pair = [t1, t2].sort().join(" vs ");
+
+if(pairs.includes(pair)){
+alert("❌ This match already added");
+el.value = "";
+return;
+}
+
+pairs.push(pair);
+}
+}
+
+function teamOptions(){
+if(!teams || teams.length === 0){
+return `<option>Loading...</option>`;
+}
+return teams.map(t=>`<option>${t}</option>`).join("");
+}
+
+// SAVE
+function saveSchedule(){
+
+let matches = [];
+let pairs = [];
+
+let isError = false;
+
+let hasAtLeastOne = false;
+
+document.querySelectorAll(".match").forEach(m=>{
+
+let s = m.querySelectorAll("select");
+
+let t1 = s[0].value;
+let t2 = s[1].value;
+
+// skip empty rows
+if(!t1 && !t2) return;
+
+// require both if one selected
+if(!t1 || !t2){
+alert("❌ Complete both teams in a match");
+isError = true;
+return;
+}
+
+// 🔥 MARK VALID MATCH
+hasAtLeastOne = true;
+
+// 🔥 BLOCK SAME TEAM
+if(t1 === t2){
+alert("❌ Same team cannot play");
+isError = true;
+return;
+}
+
+// 🔥 DUPLICATE CHECK
+let pair = [t1, t2].sort().join(" vs ");
+
+if(pairs.includes(pair)){
+alert("❌ Duplicate match");
+isError = true;
+return;
+}
+
+pairs.push(pair);
+matches.push(t1 + " VS " + t2);
+
+});
+
+if(!hasAtLeastOne){
+alert("❌ Enter at least 1 match");
+return;
+}
+
+if(isError) return;
+
+// 🔥 SHOW LOADER
+document.getElementById("popup").style.display="flex";
+document.getElementById("popupText").innerText="⏳ SAVING SCHEDULE...";
+
+let fd=new FormData();
+let editObj = JSON.parse(localStorage.getItem("editSchedule") || "null");
+
+let isEdit = editObj && editObj.index !== undefined;
+
+fd.append("action", isEdit ? "updateSchedule" : "saveSchedule");
+
+if(isEdit){
+fd.append("index", editObj.index);
+}
+
+// 🔥 DIFFERENT LOADER TEXT
+document.getElementById("popupText").innerText = isEdit 
+? "⏳ UPDATING SCHEDULE..." 
+: "⏳ SAVING SCHEDULE...";
+fd.append("tournament",t_name.value);
+fd.append("date",m_date.value);
+fd.append("matches",JSON.stringify(matches));
+
+fetch(URL,{method:"POST",body:fd})
+.then(r=>r.text())
+.then(res=>{
+
+document.getElementById("popup").style.display="none";
+alert("✅ Schedule Saved");
+
+// 🔥 CLEAR EDIT AFTER SAVE (IMPORTANT)
+localStorage.removeItem("editSchedule");
+
+// 🔥 SAVE LAST SCHEDULE LOCALLY
+localStorage.setItem("lastSchedule", JSON.stringify([
+t_name.value,
+m_date.value,
+...matches
+]));
+
+})
+.catch(()=>{
+document.getElementById("popup").style.display="none";
+alert("❌ Failed");
+});
+}
+
+function goAdmin(){
+window.location.href = "admin.html";
+}
+</script>
+
+</body>
+</html>
